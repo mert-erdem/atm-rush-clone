@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class StackItem : MonoBehaviour
 {
-    private bool isCollected = false;
+    public bool IsCollected = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(!isCollected && (other.transform.parent.CompareTag("Player") || other.CompareTag("Collectable")))
+        if(!IsCollected && ((other.transform.parent != null && other.transform.parent.CompareTag("Player")) || other.CompareTag("Collectable")))
         {
-            isCollected = true;
+            IsCollected = true;
             StackManager.Instance.AddItem(this);
         }
 

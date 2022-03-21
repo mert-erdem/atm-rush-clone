@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Components")]
+    [SerializeField] private new Rigidbody rigidbody;
     [SerializeField] private Transform playerVisual;
     [Header("Specs")]
     [SerializeField] private float speed = 5f;
@@ -12,12 +14,12 @@ public class PlayerController : MonoBehaviour
     private Vector2 mouseRootPos;
     private float inputHorizontal;
     // states
-    private State stateCurrent;
-    private State stateRun;
+    private State stateCurrent, stateRun, stateIdle;
 
     void Start()
     {
         stateRun = new State(Move, () => { }, () => { });
+        stateIdle = new State(() => { }, () => { }, () => { });
         SetState(stateRun);
     }
 
@@ -67,12 +69,23 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private IEnumerator PushBack()
+    {
+        SetState(stateIdle);
+        rigidbody.isKinematic = false;
+        rigidbody.AddForce(-transform.forward * 10, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(0.5f);
+
+        rigidbody.isKinematic = true;
+        SetState(stateRun);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Obstacle"))
         {
-            // bounce back
-            Destroy(this); 
+            StartCoroutine(PushBack());
         }
     }
 }
