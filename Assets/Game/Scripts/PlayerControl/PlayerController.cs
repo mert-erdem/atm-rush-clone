@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     // states
     private State stateCurrent, stateRun, stateIdle;
 
+
     void Start()
     {
         stateRun = new State(Move, () => { }, () => { });

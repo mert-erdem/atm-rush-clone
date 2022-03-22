@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
+using System;
 
 public class StackManager : Singleton<StackManager>
 {
@@ -9,13 +11,30 @@ public class StackManager : Singleton<StackManager>
 
     private List<StackItem> items = new List<StackItem>();
     public int ItemCount => items.Count;
+    [SerializeField] private float itemDeltaPosZ = 1.25f;
+
+    // animation
+    private bool animationPerforming = false;
+
 
     public void AddItem(StackItem item)
     {
+        if(items.Count > 0)
+        {
+            item.SetTarget(items[ItemCount - 1].transform, itemDeltaPosZ);
+        }
+        else// first item to add
+        {
+            item.SetTarget(stackRoot, itemDeltaPosZ);
+        }
+
         items.Add(item);
-        item.transform.position = stackRoot.position + Vector3.forward * items.Count * 1.2f;
-        item.transform.SetParent(stackRoot);
-        // DoTween
+        
+        if(!animationPerforming)
+        {
+            animationPerforming = true;
+            StartCoroutine(PerformCollectAnim());
+        }       
     }
 
     public void DestroyItem(StackItem collisionItem)
@@ -29,15 +48,9 @@ public class StackManager : Singleton<StackManager>
         }
         else// horizontal collision
         {
-            int j = 0;
-
             for (int i = collisionIndex; i < ItemCount; i++)
             {
-                // DoTween
-                items[i].transform.position = spreadPoints[j].position;
-                items[i].transform.SetParent(null);
-                items[i].IsCollected = false;
-                j++;
+                items[i].Throw(spreadPoints[i].position);
             }
 
             items.RemoveRange(collisionIndex, ItemCount - collisionIndex);
@@ -52,5 +65,17 @@ public class StackManager : Singleton<StackManager>
     public void DepositItem()
     {
 
+    }
+
+    private IEnumerator PerformCollectAnim()
+    {
+        for (int i = ItemCount - 1; i >= 0; i--)
+        {
+            items[i].transform.DOPunchScale(Vector3.one, 0.2f, 2, 1f);
+
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        animationPerforming = false;
     }
 }
