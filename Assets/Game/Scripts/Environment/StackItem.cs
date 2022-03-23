@@ -12,6 +12,7 @@ public class StackItem : MonoBehaviour
     private Transform followTarget;
     private float deltaPosZ;
     private int level = 0;
+    public int Level => level;
 
 
     private void Update()
@@ -56,8 +57,6 @@ public class StackItem : MonoBehaviour
         visuals[level].enabled = true;
     }
 
-    
-
     private void OnTriggerEnter(Collider other)
     {
         if(!isCollected && ((other.transform.parent != null && other.transform.parent.CompareTag("Player")) || other.CompareTag("Collectable")))
@@ -67,14 +66,19 @@ public class StackItem : MonoBehaviour
             StackManager.Instance.AddItem(this);
         }
 
-        if(other.CompareTag("Obstacle"))
+        if(other.CompareTag("Obstacle") && inStack && isCollected)
         {
             StackManager.Instance.DestroyItem(this);
         }
 
-        if(other.CompareTag("Gate"))
+        if(other.CompareTag("Gate") && inStack && isCollected)
         {
             Improve();
+        }
+
+        if(other.CompareTag("Atm") && inStack && isCollected)
+        {
+            StackManager.Instance.DepositItem(this);
         }
     }
 }

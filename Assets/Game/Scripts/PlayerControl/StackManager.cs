@@ -57,9 +57,10 @@ public class StackManager : Singleton<StackManager>
 
     }
 
-    public void DepositItem()
+    public void DepositItem(StackItem depositItem)
     {
-
+        MoneyManager.Instance.Deposit(depositItem.Level);
+        DestroyItem(depositItem);
     }
 
     private IEnumerator PerformCollectAnim()
