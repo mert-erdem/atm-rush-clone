@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System;
 
 public class StackManager : Singleton<StackManager>
 {
@@ -40,7 +39,7 @@ public class StackManager : Singleton<StackManager>
     public void DestroyItem(StackItem collisionItem)
     {
         int collisionIndex = items.IndexOf(collisionItem);
-        
+
         if (collisionIndex == ItemCount - 1)// last item collided with an obstacle
         {
             items.RemoveAt(ItemCount - 1);
@@ -55,11 +54,7 @@ public class StackManager : Singleton<StackManager>
 
             items.RemoveRange(collisionIndex, ItemCount - collisionIndex);
         }
-    }
 
-    public void ImproveItem()
-    {
-        // improve the stack's last item
     }
 
     public void DepositItem()

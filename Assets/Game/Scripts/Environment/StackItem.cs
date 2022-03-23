@@ -6,9 +6,12 @@ using UnityEngine;
 
 public class StackItem : MonoBehaviour
 {
+    [SerializeField] private List<MeshRenderer> visuals;
+
     private bool isCollected = false, inStack = false;
     private Transform followTarget;
     private float deltaPosZ;
+    private int level = 0;
 
 
     private void Update()
@@ -36,16 +39,24 @@ public class StackItem : MonoBehaviour
     {
         StartCoroutine(ThrowRoutine(position));
     }
-
     private IEnumerator ThrowRoutine(Vector3 position)
     {
         inStack = false;
-        transform.DOMove(position, 0.5f).SetEase(Ease.OutBounce);
+        transform.DOMove(position, 0.25f).SetEase(Ease.OutBounce);
 
-        yield return new WaitForSeconds(0.5001f);
+        yield return new WaitForSeconds(0.2501f);
 
         isCollected = false;
     }
+
+    private void Improve()
+    {
+        visuals[level].enabled = false;
+        level++;      
+        visuals[level].enabled = true;
+    }
+
+    
 
     private void OnTriggerEnter(Collider other)
     {
@@ -59,6 +70,11 @@ public class StackItem : MonoBehaviour
         if(other.CompareTag("Obstacle"))
         {
             StackManager.Instance.DestroyItem(this);
+        }
+
+        if(other.CompareTag("Gate"))
+        {
+            Improve();
         }
     }
 }
