@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[SelectionBase]
 public class PlayerController : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private new Rigidbody rigidbody;
     [SerializeField] private Transform playerVisual;
+    [SerializeField] private Transform miniGamePos;
     [Header("Specs")]
     [SerializeField] private float speed = 5f;
     [SerializeField] private float speedHorizontal = 5f;
@@ -19,6 +21,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        GameManager.ActionMiniGame += PerformMiniGame;
+
         stateRun = new State(Move, () => { }, () => { });
         stateIdle = new State(() => { }, () => { }, () => { });
         SetState(stateRun);
@@ -82,11 +86,72 @@ public class PlayerController : MonoBehaviour
         SetState(stateRun);
     }
 
+    private void Stop()
+    {
+        SetState(stateIdle);
+    }
+
+    private void PerformMiniGame()
+    {
+        StartCoroutine(PerformMiniGameRoutine());
+    }
+    private IEnumerator PerformMiniGameRoutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        // set root transform's position
+        var newPlayerPos = transform.position;
+        newPlayerPos.z = miniGamePos.position.z;
+        transform.position = newPlayerPos;
+        // set visual's position
+        playerVisual.position = transform.position;
+
+        var currentPoolObjectPos = miniGamePos.position;
+
+        for (int i = 0; i < StackManager.Instance.CurrentStackValue; i++)
+        {
+            var poolObject = MiniGameItemPool.Instance.GetObject();
+            poolObject.gameObject.SetActive(true);
+            // set player's position
+            newPlayerPos.y += MiniGameItemPool.Instance.GetObjectHeight();
+            transform.position = newPlayerPos;
+            // set pool object's position
+            var newPoolObjectPos = currentPoolObjectPos;
+            newPoolObjectPos.y += MiniGameItemPool.Instance.GetObjectHeight();
+            poolObject.position = newPoolObjectPos;
+            currentPoolObjectPos = newPoolObjectPos;
+
+            yield return new WaitForSeconds(0.025f);
+        }
+
+        // end level action
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Obstacle"))
         {
             StartCoroutine(PushBack());
         }
+
+        if(other.CompareTag("FinishLine"))
+        {
+            Stop();
+            GameManager.ActionMiniGame?.Invoke();
+        }
+
+        if(other.CompareTag("Multiplier"))
+        {
+            var newMultiplierPos = other.transform.position;
+            newMultiplierPos.z -= 3;
+            other.transform.position = newMultiplierPos;
+
+            MoneyManager.Instance.CurrentMultiplier = int.Parse(other.name);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.ActionMiniGame -= PerformMiniGame;
     }
 }

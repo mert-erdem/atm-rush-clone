@@ -8,6 +8,9 @@ TagManager:
   - Obstacle
   - Gate
   - Atm
+  - AtmLine
+  - FinishLine
+  - Multiplier
   layers:
   - Default
   - TransparentFX

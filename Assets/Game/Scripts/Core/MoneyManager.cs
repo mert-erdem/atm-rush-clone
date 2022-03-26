@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class MoneyManager : Singleton<MoneyManager>
 {
-    private int currentAmount, totalAmount;
+    public int CurrentMultiplier
+    {
+        set => currentMultiplier = value;
+    }
+
+    private int currentAmount, totalAmount, currentMultiplier;
 
 
     private void Start()
@@ -15,12 +20,12 @@ public class MoneyManager : Singleton<MoneyManager>
 
     public void Deposit(int itemLevel)
     {
-        currentAmount += (itemLevel + 1) * 2;
+        currentAmount += itemLevel + 1;
     }
 
-    public void SaveTheAmount()
+    public void SaveTheAmount()// level finish action
     {
-        totalAmount += currentAmount;
+        totalAmount += currentAmount * currentMultiplier;
         PlayerPrefs.SetInt("TOTAL_MONEY", totalAmount);
     }
 }
