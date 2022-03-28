@@ -1,15 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private CinemachineVirtualCamera cmInGame, cmMiniGame;
+    [SerializeField] private CinemachineVirtualCamera cmMenu, cmInGame, cmMiniGame;
 
     private void OnEnable()
     {
+        GameManager.ActionGameStart += SetInGameCamera;
         GameManager.ActionMiniGame += SetMiniGameCamera;
+    }
+
+    private void SetInGameCamera()
+    {
+        cmMenu.enabled = false;
+        cmInGame.enabled = true;
     }
 
     private void SetMiniGameCamera()
@@ -20,6 +25,7 @@ public class CameraController : MonoBehaviour
 
     private void OnDisable()
     {
+        GameManager.ActionGameStart -= SetInGameCamera;
         GameManager.ActionMiniGame -= SetMiniGameCamera;
     }
 }

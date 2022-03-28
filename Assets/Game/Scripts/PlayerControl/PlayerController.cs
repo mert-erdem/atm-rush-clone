@@ -21,11 +21,12 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        GameManager.ActionGameStart += StartToMove;
         GameManager.ActionMiniGame += PerformMiniGame;
 
         stateRun = new State(Move, () => { }, () => { });
         stateIdle = new State(() => { }, () => { }, () => { });
-        SetState(stateRun);
+        SetState(stateIdle);
     }
 
     void Update()
@@ -86,6 +87,11 @@ public class PlayerController : MonoBehaviour
         SetState(stateRun);
     }
 
+    private void StartToMove()
+    {
+        SetState(stateRun);
+    }
+
     private void Stop()
     {
         SetState(stateIdle);
@@ -125,6 +131,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // end level action
+        GameManager.ActionGameEnd?.Invoke();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -152,6 +159,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDestroy()
     {
+        GameManager.ActionGameStart -= StartToMove;
         GameManager.ActionMiniGame -= PerformMiniGame;
     }
 }

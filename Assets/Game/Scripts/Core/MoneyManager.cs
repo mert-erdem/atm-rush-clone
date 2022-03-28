@@ -9,23 +9,31 @@ public class MoneyManager : Singleton<MoneyManager>
         set => currentMultiplier = value;
     }
 
-    private int currentAmount, totalAmount, currentMultiplier;
+    private int totalAmount, currentMultiplier;
 
 
     private void Start()
     {
-        currentAmount = 0;
+        GameManager.ActionGameEnd += SaveTheAmount;
+
         totalAmount = PlayerPrefs.GetInt("TOTAL_MONEY", 0);
+        CanvasController.Instance.UpdateTotalMoneyText(totalAmount);
     }
 
-    public void Deposit(int itemLevel)
+    public void Deposit(int itemLevel)// atm
     {
-        currentAmount += itemLevel + 1;
+        totalAmount += itemLevel + 1;
     }
 
-    public void SaveTheAmount()// level finish action
+    private void SaveTheAmount()// level finish action
     {
-        totalAmount += currentAmount * currentMultiplier;
+        totalAmount += StackManager.Instance.CurrentStackValue * currentMultiplier;
         PlayerPrefs.SetInt("TOTAL_MONEY", totalAmount);
+        CanvasController.Instance.UpdateTotalMoneyText(totalAmount);
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.ActionGameEnd -= SaveTheAmount;
     }
 }
