@@ -1,5 +1,5 @@
 # Atm Rush Clone
-A clone of the hyper-casual game that named "Stacky Dash".
+A clone of the hyper-casual game that named "Atm Rush".
 ## Platform
 * Unity 2020.3.25f1
 ## Gameplay
